@@ -3,795 +3,223 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>衡数 Hengshu</title>
+<title>Sumora</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="衡数：与高校教师和一线执业专家合作，为专业领域 AI 构建专家级评测集、评分细则和可验证训练任务。">
+<meta name="description" content="Sumora works with practicing experts to build evaluation and training data for frontier AI.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400&family=Noto+Serif+SC:wght@500&family=Noto+Sans+SC:wght@400&display=swap">
 <style>
-/* Layout: a standards-document page. Ink-blue rules and a title block frame each section; one vermilion seal marks expert review. */
+/* Layout: one quiet column on a dark field. Many faint points slowly gather into a single line: many expert judgments, one standard. */
 :root {
-  --paper: #F3F6F8;
-  --surface: #FFFFFF;
-  --ink: #13202B;
-  --muted: #586672;
-  --line: #D3DBE1;
-  --blue: #1F4E79;
-  --blue-soft: #E3ECF4;
-  --seal: #B4372A;
-  --ok: #2F6B4F;
-  --font-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
-  --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --step--1: 0.8125rem;
-  --step-0: 1rem;
-  --step-1: 1.1875rem;
-  --step-2: 1.5rem;
-  --step-3: 2.125rem;
-  --step-4: clamp(2.25rem, 5.2vw, 3.5rem);
-  --radius: 6px;
-  --max: 1120px;
+  --field: #F2F1EE;
+  --ink: #16181C;
+  --dim: #6B6E74;
+  --hair: #D9D8D3;
+  --brass: #8C7346;
+  --dot: 22, 24, 28;
+  --font-display: "Instrument Serif", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --font-cn-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-body: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #0E161D; --surface: #15212B; --ink: #E3E9EE; --muted: #93A1AC;
-    --line: #273642; --blue: #84B3DC; --blue-soft: #1A2C3B; --seal: #E2705F; --ok: #74B996;
+    --field: #0F1013; --ink: #E9E6DF; --dim: #8D8F94; --hair: #24262B; --brass: #C3A874; --dot: 233, 230, 223;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #0E161D; --surface: #15212B; --ink: #E3E9EE; --muted: #93A1AC;
-  --line: #273642; --blue: #84B3DC; --blue-soft: #1A2C3B; --seal: #E2705F; --ok: #74B996;
+  --field: #0F1013; --ink: #E9E6DF; --dim: #8D8F94; --hair: #24262B; --brass: #C3A874; --dot: 233, 230, 223;
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+html, body { margin: 0; }
 body {
-  margin: 0;
-  background: var(--paper);
+  background: var(--field);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: var(--step-0);
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  min-height: 100%;
 }
-body::before {
-  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
-  z-index: 10; background: var(--paper);
+canvas#field { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.page {
+  position: relative; z-index: 1;
+  max-width: 980px; margin: 0 auto;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
 }
-h1, h2, h3 { font-family: var(--font-display); font-weight: 900; line-height: 1.25; margin: 0; text-wrap: balance; }
-h3 { font-weight: 600; }
-p { margin: 0; }
-a { color: var(--blue); }
-:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 2px; }
+:focus-visible { outline: 1px solid var(--brass); outline-offset: 3px; }
+a { color: inherit; }
 
-.wrap {
-  max-width: var(--max);
-  margin: 0 auto;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-}
-.eyebrow {
-  font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--blue);
-}
-.lede { color: var(--muted); font-size: var(--step-1); max-width: 38em; }
-.mono { font-family: var(--font-mono); }
+header { display: flex; justify-content: space-between; align-items: center; padding-block: 28px; }
+.mark { font-family: var(--font-display); font-size: 1.625rem; letter-spacing: 0.01em; text-decoration: none; }
+.label { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
+header a.label { text-decoration: none; }
+header a.label:hover { color: var(--ink); }
 
-/* Header */
-.site-head {
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
-  background: color-mix(in srgb, var(--paper) 92%, transparent);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line);
+.hero { padding-block: clamp(80px, 16vh, 168px) clamp(64px, 12vh, 120px); max-width: 760px; }
+.hero h1 {
+  font-family: var(--font-display); font-weight: 400; margin: 0;
+  font-size: clamp(2.75rem, 7.4vw, 5.25rem); line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance;
 }
-.site-head .wrap { display: flex; align-items: center; gap: 24px; padding-block: 12px; }
-.brand { display: flex; align-items: baseline; gap: 10px; text-decoration: none; color: var(--ink); }
-.brand b { font-family: var(--font-display); font-size: 1.375rem; font-weight: 900; letter-spacing: 0.04em; }
-.brand span { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); letter-spacing: 0.12em; }
-.nav { display: flex; gap: 20px; margin-left: auto; flex-wrap: wrap; }
-.nav a { color: var(--muted); text-decoration: none; font-size: 0.9375rem; }
-.nav a:hover { color: var(--ink); }
-.btn {
-  display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
-  border-radius: var(--radius); border: 1px solid var(--blue);
-  background: var(--blue); color: var(--paper); text-decoration: none;
-  font: 500 0.9375rem/1.2 var(--font-body); cursor: pointer;
-}
-.btn.ghost { background: transparent; color: var(--blue); }
-.btn:hover { filter: brightness(1.08); }
-@media (max-width: 760px) { .nav { display: none; } .site-head .btn { margin-left: auto; } }
+.hero h1 em { font-style: italic; color: var(--brass); }
+.hero .cn-head { font-family: var(--font-cn-display); font-weight: 500; font-size: clamp(1.125rem, 2.4vw, 1.5rem); margin: 22px 0 0; letter-spacing: 0.04em; }
+.hero p.sub { color: var(--dim); max-width: 34em; margin: 28px 0 0; }
+.hero p.sub span { display: block; }
 
-/* Hero */
-.hero .wrap {
-  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 48px; align-items: center; padding-block: 64px 72px;
-}
-.hero h1 { font-size: var(--step-4); margin-block: 14px 20px; }
-.hero h1 em { font-style: normal; color: var(--blue); }
-.hero .en { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); margin-top: 18px; }
-.hero .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
-@media (max-width: 860px) { .hero .wrap { grid-template-columns: 1fr; padding-block: 40px 48px; } }
+.rule { border: 0; border-top: 1px solid var(--hair); margin: 0; }
 
-/* Rubric sheet (hero visual) */
-.sheet {
-  position: relative; background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius); box-shadow: 0 18px 40px -24px rgba(19, 32, 43, 0.35);
-  font-size: 0.875rem; min-width: 0;
-}
-.sheet-head {
-  display: grid; grid-template-columns: 1fr auto; border-bottom: 1.5px solid var(--ink);
-}
-.sheet-head > div { padding: 12px 16px; }
-.sheet-head .code { border-left: 1px solid var(--line); font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-align: right; }
-.sheet-head h3 { font-size: 1rem; }
-.sheet ol { list-style: none; margin: 0; padding: 6px 16px 14px; }
-.sheet li {
-  display: grid; grid-template-columns: 1.4em 1fr auto; gap: 10px; align-items: baseline;
-  padding: 9px 0; border-bottom: 1px dashed var(--line);
-}
-.sheet li:last-child { border-bottom: 0; }
-.tick { font-family: var(--font-mono); color: var(--ok); font-weight: 600; }
-.tick.miss { color: var(--seal); }
-.pts { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.tag {
-  display: inline-block; font-family: var(--font-mono); font-size: 0.6875rem; padding: 1px 6px;
-  border-radius: 3px; border: 1px solid var(--line); color: var(--muted); margin-left: 6px; white-space: nowrap;
-}
-.tag.auto { color: var(--blue); border-color: color-mix(in srgb, var(--blue) 45%, transparent); }
-.sheet-foot {
-  display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  border-top: 1.5px solid var(--ink); padding: 10px 16px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);
-}
-.seal {
-  position: absolute; right: 22px; bottom: 46px; width: 84px; height: 84px; border-radius: 50%;
-  border: 2.5px solid var(--seal); color: var(--seal); display: grid; place-items: center;
-  font-family: var(--font-display); font-weight: 900; font-size: 0.9375rem; line-height: 1.15; text-align: center;
-  transform: rotate(-14deg); opacity: 0.85; pointer-events: none;
-}
-.seal small { display: block; font-family: var(--font-mono); font-size: 0.5625rem; font-weight: 400; letter-spacing: 0.06em; }
-.sample-note { font-size: 0.75rem; color: var(--muted); margin-top: 10px; }
+.pillars { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding-block: 44px; }
+.pillars h2 { font-family: var(--font-display); font-weight: 400; font-size: 1.625rem; margin: 10px 0 6px; line-height: 1.2; }
+.pillars p { margin: 0; color: var(--dim); font-size: 0.9375rem; }
+@media (max-width: 720px) { .pillars { grid-template-columns: 1fr; gap: 28px; } }
 
-/* Sections */
-section.block { border-top: 1px solid var(--line); }
-section.block > .wrap { padding-block: 72px; }
-.section-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px; margin-bottom: 40px; align-items: end; }
-.section-head h2 { font-size: var(--step-3); margin-top: 8px; }
-@media (max-width: 760px) { .section-head { grid-template-columns: 1fr; gap: 12px; } section.block > .wrap { padding-block: 52px; } }
+.domains { display: flex; flex-wrap: wrap; gap: 8px 28px; padding-block: 28px; font-size: 0.9375rem; }
+.domains span { white-space: nowrap; }
+.domains .label { width: 100%; }
 
-/* Why now */
-.why { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1.5px solid var(--ink); }
-.why > div { padding: 22px 24px 4px 0; }
-.why > div + div { padding-left: 24px; border-left: 1px solid var(--line); }
-.why h3 { font-size: var(--step-1); margin-bottom: 10px; }
-.why p { color: var(--muted); }
-@media (max-width: 760px) {
-  .why { grid-template-columns: 1fr; }
-  .why > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
-}
+.contact { padding-block: 72px 56px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: end; }
+.contact h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(2rem, 4.4vw, 3rem); line-height: 1.08; margin: 0; text-wrap: balance; }
+.contact .cn { font-family: var(--font-cn-display); color: var(--dim); margin-top: 14px; }
+.lines { display: grid; gap: 0; }
+.line { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding-block: 14px; border-bottom: 1px solid var(--hair); min-width: 0; }
+.line:first-child { border-top: 1px solid var(--hair); }
+.line .label { width: 72px; flex: none; }
+.line b { flex: 1; font-weight: 400; font-family: var(--font-mono); font-size: 0.9375rem; word-break: break-all; }
+.copy { appearance: none; background: none; border: 0; padding: 0; color: var(--dim); font: 0.75rem var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
+.copy:hover { color: var(--brass); }
+.note { color: var(--dim); font-size: 0.8125rem; margin-top: 16px; }
+@media (max-width: 720px) { .contact { grid-template-columns: 1fr; padding-block: 56px 40px; } }
 
-/* Products */
-.products { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-.product { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.product .kicker { font-family: var(--font-mono); font-size: 0.75rem; color: var(--blue); letter-spacing: 0.06em; }
-.product h3 { font-size: var(--step-2); }
-.product p { color: var(--muted); }
-.product ul { margin: 4px 0 0; padding-left: 1.1em; }
-.product li { margin: 2px 0; }
-.product .for { margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 0.875rem; color: var(--muted); }
-@media (max-width: 760px) { .products { grid-template-columns: 1fr; } }
-
-/* Domains */
-.domains { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
-.domain { padding: 24px 22px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.domain + .domain { border-left: 1px solid var(--line); }
-.domain .no { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
-.domain h3 { font-size: var(--step-1); }
-.domain dl { margin: 0; display: grid; gap: 10px; font-size: 0.875rem; }
-.domain dt { font-weight: 700; font-size: 0.75rem; color: var(--blue); letter-spacing: 0.04em; }
-.domain dd { margin: 2px 0 0; color: var(--muted); }
-@media (max-width: 960px) {
-  .domains { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .domain:nth-child(3) { border-left: 0; }
-  .domain:nth-child(n+3) { border-top: 1px solid var(--line); }
-}
-@media (max-width: 560px) {
-  .domains { grid-template-columns: 1fr; }
-  .domain + .domain { border-left: 0; border-top: 1px solid var(--line); }
-}
-
-/* Sample viewer */
-.tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1.5px solid var(--ink); }
-.tab {
-  appearance: none; border: 1px solid transparent; border-bottom: 0; background: transparent; color: var(--muted);
-  padding: 10px 16px; font: 500 0.9375rem var(--font-body); cursor: pointer; border-radius: var(--radius) var(--radius) 0 0;
-}
-.tab[aria-selected="true"] { background: var(--surface); color: var(--ink); border-color: var(--line); }
-.viewer { background: var(--surface); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 var(--radius) var(--radius); }
-.viewer-grid { display: grid; grid-template-columns: 240px minmax(0, 1fr); }
-.meta { border-right: 1px solid var(--line); padding: 22px; display: grid; gap: 14px; align-content: start; font-size: 0.875rem; }
-.meta div span { display: block; font-size: 0.75rem; color: var(--muted); }
-.meta div b { font-weight: 500; }
-.task { padding: 22px 26px 26px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; min-width: 0; }
-.task > div { min-width: 0; }
-.task h4 { margin: 0 0 8px; font-size: 0.8125rem; font-family: var(--font-mono); letter-spacing: 0.06em; color: var(--blue); font-weight: 600; }
-.task .prompt { font-size: 1.0625rem; }
-.materials { background: var(--blue-soft); border-radius: var(--radius); padding: 14px 16px; font-size: 0.9375rem; }
-.materials ul, .answer ul { margin: 0; padding-left: 1.2em; }
-.answer li, .materials li { margin: 3px 0; }
-.table-scroll { overflow-x: auto; }
-table.rubric { width: 100%; border-collapse: collapse; font-size: 0.875rem; min-width: 520px; }
-table.rubric th { text-align: left; font-weight: 700; font-size: 0.75rem; color: var(--muted); border-bottom: 1.5px solid var(--ink); padding: 6px 8px; }
-table.rubric td { border-bottom: 1px solid var(--line); padding: 8px; vertical-align: top; }
-table.rubric td.w { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-.viewer-foot { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; border-top: 1px solid var(--line); padding: 12px 22px; font-size: 0.8125rem; color: var(--muted); }
-.json { margin: 0; padding: 18px 22px; background: var(--paper); border-top: 1px solid var(--line); font: 0.8125rem/1.6 var(--font-mono); overflow-x: auto; white-space: pre; max-height: 420px; }
-@media (max-width: 760px) {
-  .viewer-grid { grid-template-columns: 1fr; }
-  .meta { border-right: 0; border-bottom: 1px solid var(--line); grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .task { padding: 20px 16px; }
-}
-
-/* Quality */
-.quality { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 32px; }
-.quality > div { border-top: 1.5px solid var(--ink); padding-top: 14px; }
-.quality h3 { font-size: var(--step-1); margin-bottom: 8px; }
-.quality p { color: var(--muted); font-size: 0.9375rem; }
-@media (max-width: 860px) { .quality { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 560px) { .quality { grid-template-columns: 1fr; } }
-
-/* Process */
-.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); counter-reset: step; }
-.step { padding: 0 20px 0 0; position: relative; }
-.step + .step { padding-left: 20px; border-left: 1px solid var(--line); }
-.step::before {
-  counter-increment: step; content: "第 " counter(step) " 步";
-  display: block; font-family: var(--font-mono); font-size: 0.75rem; color: var(--blue); margin-bottom: 8px;
-}
-.step h3 { font-size: var(--step-1); margin-bottom: 6px; }
-.step p { color: var(--muted); font-size: 0.9375rem; }
-@media (max-width: 860px) {
-  .steps { grid-template-columns: 1fr 1fr; gap: 28px 0; }
-  .step:nth-child(3) { padding-left: 0; border-left: 0; }
-}
-@media (max-width: 560px) {
-  .steps { grid-template-columns: 1fr; }
-  .step + .step { padding-left: 0; border-left: 0; }
-}
-
-/* Contact */
-.contact { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 48px; }
-.channels { display: grid; gap: 12px; margin-top: 24px; }
-.channel { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
-.channel span { display: block; font-size: 0.75rem; color: var(--muted); }
-.channel b { font-family: var(--font-mono); font-weight: 600; word-break: break-all; }
-.copy { appearance: none; border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 4px; padding: 5px 10px; font: 0.8125rem var(--font-body); cursor: pointer; white-space: nowrap; }
-.copy:hover { border-color: var(--blue); color: var(--blue); }
-form.brief { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: grid; gap: 16px; }
-.field { display: grid; gap: 6px; }
-.field label, .field legend { font-size: 0.8125rem; font-weight: 700; }
-.field input, .field select, .field textarea {
-  width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px;
-  background: var(--paper); color: var(--ink); font: 0.9375rem var(--font-body);
-}
-.field textarea { min-height: 96px; resize: vertical; }
-fieldset.field { border: 0; padding: 0; margin: 0; }
-.checks { display: flex; flex-wrap: wrap; gap: 8px 16px; }
-.checks label { font-weight: 400; font-size: 0.9375rem; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 560px) { .row2 { grid-template-columns: 1fr; } }
-.summary { display: grid; gap: 8px; }
-.summary textarea { width: 100%; min-height: 150px; padding: 12px; font: 0.8125rem/1.6 var(--font-mono); border: 1px solid var(--blue); border-radius: 4px; background: var(--blue-soft); color: var(--ink); }
-.status { font-size: 0.8125rem; color: var(--ok); min-height: 1.2em; }
-@media (max-width: 860px) { .contact { grid-template-columns: 1fr; } }
-
-footer { border-top: 1.5px solid var(--ink); }
-footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 24px 40px; font-size: 0.8125rem; color: var(--muted); }
+footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 24px 40px; border-top: 1px solid var(--hair); }
 </style>
 </head>
 <body>
+<canvas id="field" aria-hidden="true"></canvas>
 
-<header class="site-head">
-  <div class="wrap">
-    <a class="brand" href="#top"><b>衡数</b><span>HENGSHU</span></a>
-    <nav class="nav" aria-label="页面导航">
-      <a href="#products">服务</a>
-      <a href="#domains">专业领域</a>
-      <a href="#samples">数据样例</a>
-      <a href="#quality">质量标准</a>
-      <a href="#process">合作流程</a>
-    </nav>
-    <a class="btn" href="#contact">获取样例</a>
-  </div>
-</header>
+<div class="page">
+  <header>
+    <a class="mark" href="#top" id="top">Sumora</a>
+    <a class="label" href="#contact">Contact</a>
+  </header>
 
-<main id="top">
-  <section class="hero">
-    <div class="wrap">
+  <main>
+    <section class="hero">
+      <h1>Expert judgment,<br><em>made measurable.</em></h1>
+      <p class="cn-head">把专家的判断，变成 AI 可以学习的标准。</p>
+      <p class="sub">
+        <span>We work with practicing experts to build evaluation and training data for AI in high-stakes professional fields.</span>
+        <span style="margin-top: 8px;">我们与一线专家合作，为高风险专业领域的 AI 构建评测与训练数据。</span>
+      </p>
+    </section>
+
+    <hr class="rule">
+
+    <section class="pillars" aria-label="What we build">
+      <div><span class="label">评测 · Evaluation</span><h2>Private benchmarks</h2><p>Expert-built tasks, never published.</p></div>
+      <div><span class="label">标准 · Rubrics</span><h2>Calibrated criteria</h2><p>Expert standards that machines can grade against.</p></div>
+      <div><span class="label">训练 · Environments</span><h2>Verifiable tasks</h2><p>Work with a right answer, built for reinforcement learning.</p></div>
+    </section>
+
+    <hr class="rule">
+
+    <section class="domains" aria-label="Fields">
+      <span class="label">Fields · 领域</span>
+      <span>Nutrition 营养</span>
+      <span>Safety 安全</span>
+      <span>Built environment 建筑工程</span>
+      <span>Medical devices 医疗器械</span>
+      <span style="color: var(--dim);">More by request 更多领域按需</span>
+    </section>
+
+    <hr class="rule">
+
+    <section class="contact" id="contact">
       <div>
-        <p class="eyebrow">专业领域 AI · 专家级数据</p>
-        <h1>给专业 AI 出考题，<br>也教它<em>答对</em>。</h1>
-        <p class="lede">衡数与高校教师和一线执业专家合作，把营养、安全、建筑工程、医疗器械注册等领域的真实工作，做成可评测、可判分、可用于训练的专家数据。</p>
-        <p class="en">Expert-grade evaluation sets, rubrics and verifiable training tasks for professional AI.</p>
-        <div class="actions">
-          <a class="btn" href="#samples">查看数据样例</a>
-          <a class="btn ghost" href="#contact">定制合作</a>
-        </div>
+        <h2>We work with a small number of partners.</h2>
+        <p class="cn">我们只与少量伙伴合作。告诉我们你在做什么。</p>
       </div>
-
       <div>
-        <div class="sheet" aria-label="评分细则示例">
-          <div class="sheet-head">
-            <div>
-              <h3>评分细则 · 危大工程识别</h3>
-              <div class="pts">建筑设计与施工 / 专家判分 + 自动判分</div>
-            </div>
-            <div class="code">HS-CON-0042<br>v1.2</div>
-          </div>
-          <ol>
-            <li><span class="tick">✓</span><span>基坑开挖 6.2 m 判为超过一定规模<span class="tag auto">自动</span></span><span class="pts">20</span></li>
-            <li><span class="tick">✓</span><span>模板支撑 9 m 判为需专家论证<span class="tag auto">自动</span></span><span class="pts">20</span></li>
-            <li><span class="tick miss">✗</span><span>人工挖孔桩 12 m 误判为超规模<span class="tag auto">自动</span></span><span class="pts">0 / 15</span></li>
-            <li><span class="tick">✓</span><span>引用的规定条文准确<span class="tag">专家</span></span><span class="pts">15</span></li>
-            <li><span class="tick">✓</span><span>专项方案要点完整、可执行<span class="tag">专家</span></span><span class="pts">22 / 30</span></li>
-          </ol>
-          <div class="sheet-foot"><span>得分 77 / 100</span><span>双人复核</span></div>
-          <div class="seal" aria-hidden="true"><span>专家<br>复核<small>REVIEWED</small></span></div>
+        <div class="lines">
+          <div class="line"><span class="label">Email</span><b id="c-email">待填写</b><button class="copy" type="button" data-copy="c-email">Copy</button></div>
+          <div class="line"><span class="label">WeChat</span><b id="c-wechat">待填写</b><button class="copy" type="button" data-copy="c-wechat">Copy</button></div>
         </div>
-        <p class="sample-note">示例：展示评分细则的形式，并非真实模型的成绩。</p>
+        <p class="note">Samples are shared under NDA. 样例数据在签署保密协议后提供。</p>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <section class="block" id="why">
-    <div class="wrap">
-      <div class="section-head">
-        <div><p class="eyebrow">为什么需要</p><h2>模型会考试，不等于会干活</h2></div>
-        <p class="lede">通用题库快被大模型做穿了。真正决定专业 AI 能不能用的，是它在具体规范、具体场景下能不能做出合格的判断。</p>
-      </div>
-      <div class="why">
-        <div><h3>专业场景错不起</h3><p>膳食建议、施工安全、注册申报，一个看似合理的错误答案就可能带来健康、安全或合规风险。</p></div>
-        <div><h3>对错要专家来定</h3><p>很多专业任务没有唯一答案。需要专家把"什么算合格"拆成可以逐条检查的标准，模型才能被公正地评价和训练。</p></div>
-        <div><h3>真实题目稀缺</h3><p>公开数据里很少有贴近国内规范和真实项目的任务。好的题目来自做过这些工作的人。</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="products">
-    <div class="wrap">
-      <div class="section-head">
-        <div><p class="eyebrow">服务</p><h2>四类交付物</h2></div>
-        <p class="lede">同一套专家资产，可以用来评测模型，也可以用来训练模型。按需组合，可以先从小批量样例开始。</p>
-      </div>
-      <div class="products">
-        <article class="product">
-          <span class="kicker">EVALUATION</span>
-          <h3>专家评测集</h3>
-          <p>按领域构建的私有评测题库，衡量模型或 Agent 在真实专业任务上的表现。</p>
-          <ul><li>私有题目，不公开，降低泄漏和刷榜风险</li><li>附多个主流模型的实测对比报告</li><li>按季度更新题目</li></ul>
-          <p class="for">适合：模型团队、行业 AI 产品选型</p>
-        </article>
-        <article class="product">
-          <span class="kicker">RUBRICS</span>
-          <h3>评分细则与校准裁判</h3>
-          <p>专家把"好答案"拆成带权重的检查项，并配一个与专家打分校准过的大模型裁判。</p>
-          <ul><li>每条细则写明依据的规范或指南</li><li>给出裁判与专家打分的一致性数据</li><li>可直接用于强化学习的奖励信号</li></ul>
-          <p class="for">适合：做后训练、需要判断开放式回答质量的团队</p>
-        </article>
-        <article class="product">
-          <span class="kicker">RL TASKS</span>
-          <h3>可验证训练任务</h3>
-          <p>有明确判分程序的任务，模型可以反复练习，程序自动给出对错。</p>
-          <ul><li>任务、参考答案、自动判分程序一体交付</li><li>判分程序经过反作弊测试</li><li>标注难度，便于挑选训练区间</li></ul>
-          <p class="for">适合：做强化学习和 Agent 训练的团队</p>
-        </article>
-        <article class="product">
-          <span class="kicker">CUSTOM</span>
-          <h3>定制数据与专家标注</h3>
-          <p>按你的场景定制问答、推理过程、偏好对比和审核数据，由对应领域专家完成和复核。</p>
-          <ul><li>从需求访谈开始，先做样例再放量</li><li>支持私有化交付和保密协议</li><li>可按项目或按订阅合作</li></ul>
-          <p class="for">适合：垂直 AI 应用、企业内部 AI 项目</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="domains">
-    <div class="wrap">
-      <div class="section-head">
-        <div><p class="eyebrow">专业领域</p><h2>首批覆盖四个领域</h2></div>
-        <p class="lede">每个领域由高校教师和一线执业专家共同出题、制定细则和复核，题目依据国内现行标准和规范。</p>
-      </div>
-      <div class="domains">
-        <div class="domain">
-          <span class="no">D1</span>
-          <h3>营养与膳食</h3>
-          <dl>
-            <div><dt>典型任务</dt><dd>慢病人群食谱设计、营养素计算、膳食评估与建议</dd></div>
-            <div><dt>判分依据</dt><dd>中国居民膳食营养素参考摄入量、食物成分表、相关疾病营养治疗指南</dd></div>
-          </dl>
-        </div>
-        <div class="domain">
-          <span class="no">D2</span>
-          <h3>食品与生产安全</h3>
-          <dl>
-            <div><dt>典型任务</dt><dd>食品标签合规审查、风险识别、安全检查与整改建议</dd></div>
-            <div><dt>判分依据</dt><dd>食品安全国家标准（如 GB 7718、GB 28050）、安全生产相关规定</dd></div>
-          </dl>
-        </div>
-        <div class="domain">
-          <span class="no">D3</span>
-          <h3>建筑设计与施工</h3>
-          <dl>
-            <div><dt>典型任务</dt><dd>危大工程识别、专项方案审查、设计校核、规范条文应用</dd></div>
-            <div><dt>判分依据</dt><dd>住建部危大工程管理规定、国家与行业设计施工规范</dd></div>
-          </dl>
-        </div>
-        <div class="domain">
-          <span class="no">D4</span>
-          <h3>医疗器械注册</h3>
-          <dl>
-            <div><dt>典型任务</dt><dd>产品分类界定、注册路径判断、申报资料审查</dd></div>
-            <div><dt>判分依据</dt><dd>医疗器械分类目录、注册与备案管理办法、各类注册审查指导原则</dd></div>
-          </dl>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="samples">
-    <div class="wrap">
-      <div class="section-head">
-        <div><p class="eyebrow">数据样例</p><h2>一道题交付时长什么样</h2></div>
-        <p class="lede">每道题包含题目、材料、参考答案要点、评分细则和判分方式。下面是四个领域各一道示例，题目信息为虚构，用于展示格式。</p>
-      </div>
-      <div class="tabs" role="tablist" aria-label="选择领域"></div>
-      <div class="viewer" id="viewer" role="tabpanel"></div>
-    </div>
-  </section>
-
-  <section class="block" id="quality">
-    <div class="wrap">
-      <div class="section-head">
-        <div><p class="eyebrow">质量标准</p><h2>每批数据的交付承诺</h2></div>
-        <p class="lede">专家数据的价值在于可信。以下标准写进每一份交付说明，并随数据附上检查记录。</p>
-      </div>
-      <div class="quality">
-        <div><h3>双人复核</h3><p>每道题由出题专家之外的第二位专家独立复核，分歧由第三位专家仲裁，并记录一致率。</p></div>
-        <div><h3>判分程序反作弊</h3><p>上线前专门尝试用格式取巧、答案硬编码等方式骗过判分程序，修补漏洞后再交付。</p></div>
-        <div><h3>难度实测标定</h3><p>每道题用多个主流模型实测，记录通过率，帮助你挑选最有训练价值的难度区间。</p></div>
-        <div><h3>裁判一致性</h3><p>大模型裁判的打分与专家打分做一致性对比，达不到约定阈值的细则会被重写。</p></div>
-        <div><h3>私有与去污染</h3><p>题目不公开发布，交付前检查与公开数据的重复，避免评测结果虚高。</p></div>
-        <div><h3>合规与授权</h3><p>真实素材均做脱敏处理，专家签署知识产权与保密协议，权属清晰。</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="process">
-    <div class="wrap">
-      <div class="section-head">
-        <div><p class="eyebrow">合作流程</p><h2>从样例开始，不必一次买很多</h2></div>
-        <p class="lede">先确认数据真的对你有用，再决定规模。</p>
-      </div>
-      <div class="steps">
-        <div class="step"><h3>需求沟通</h3><p>了解你的模型或产品、目标场景和现有短板，确定领域和题型。</p></div>
-        <div class="step"><h3>样例题</h3><p>提供 5 到 10 道样例题和评分细则，你可以先拿去测自己的模型。</p></div>
-        <div class="step"><h3>试点交付</h3><p>小批量交付，附实测报告和质量检查记录，按反馈调整。</p></div>
-        <div class="step"><h3>长期合作</h3><p>按季度更新题库，或按项目持续定制。</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="contact">
-    <div class="wrap contact">
-      <div>
-        <p class="eyebrow">联系我们</p>
-        <h2 style="font-size: var(--step-3); margin-top: 8px;">说说你的场景，<br>我们先出几道样例题</h2>
-        <p class="lede" style="margin-top: 16px;">填写右侧表单会生成一段需求摘要，复制后通过微信或邮件发给我们即可。</p>
-        <div class="channels">
-          <div class="channel"><div><span>微信</span><b id="c-wechat">待填写</b></div><button class="copy" type="button" data-copy="c-wechat">复制</button></div>
-          <div class="channel"><div><span>邮箱</span><b id="c-email">待填写</b></div><button class="copy" type="button" data-copy="c-email">复制</button></div>
-          <div class="channel"><div><span>小红书</span><b id="c-xhs">待填写</b></div><button class="copy" type="button" data-copy="c-xhs">复制</button></div>
-        </div>
-      </div>
-
-      <form class="brief" id="brief" novalidate>
-        <div class="row2">
-          <div class="field"><label for="f-org">机构或公司</label><input id="f-org" name="org" placeholder="例如：某大模型团队"></div>
-          <div class="field"><label for="f-role">你的角色</label><input id="f-role" name="role" placeholder="例如：后训练负责人"></div>
-        </div>
-        <fieldset class="field">
-          <legend>感兴趣的领域</legend>
-          <div class="checks">
-            <label><input type="checkbox" id="f-d1" name="domain" value="营养与膳食" checked> 营养与膳食</label>
-            <label><input type="checkbox" id="f-d2" name="domain" value="食品与生产安全"> 食品与生产安全</label>
-            <label><input type="checkbox" id="f-d3" name="domain" value="建筑设计与施工"> 建筑设计与施工</label>
-            <label><input type="checkbox" id="f-d4" name="domain" value="医疗器械注册"> 医疗器械注册</label>
-            <label><input type="checkbox" id="f-d5" name="domain" value="其他领域"> 其他</label>
-          </div>
-        </fieldset>
-        <div class="field">
-          <label for="f-type">需要什么</label>
-          <select id="f-type" name="type">
-            <option>专家评测集</option>
-            <option>评分细则与校准裁判</option>
-            <option>可验证训练任务</option>
-            <option>定制数据与专家标注</option>
-            <option>还不确定，想先聊聊</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="f-note">场景说明</label>
-          <textarea id="f-note" name="note" placeholder="例如：我们在做面向糖尿病人群的饮食助手，想评估模型给出的食谱是否符合指南。"></textarea>
-        </div>
-        <button class="btn" type="submit">生成需求摘要</button>
-        <div class="summary" id="summary" hidden>
-          <label for="f-summary" style="font-size: 0.8125rem; font-weight: 700;">需求摘要</label>
-          <textarea id="f-summary" readonly></textarea>
-          <div style="display: flex; gap: 12px; align-items: center;">
-            <button class="copy" type="button" id="copy-summary">复制摘要</button>
-            <span class="status" id="status" aria-live="polite"></span>
-          </div>
-        </div>
-      </form>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap">
-    <span>衡数 Hengshu · 专业领域 AI 的专家数据</span>
-    <span>页面中的题目与评分均为格式示例</span>
-  </div>
-</footer>
+  <footer>
+    <span class="label">© 2026 Sumora</span>
+    <span class="label">By request only</span>
+  </footer>
+</div>
 
 <script>
-const SAMPLES = [
-  {
-    id: "HS-NUT-0107",
-    domain: "营养与膳食",
-    type: "食谱设计 + 营养计算",
-    grading: "自动判分 60% · 专家细则 40%",
-    difficulty: "中高（交付时附模型实测通过率）",
-    basis: "中国居民膳食营养素参考摄入量；中国食物成分表；糖尿病医学营养治疗相关指南",
-    prompt: "请为下面这位患者设计一日食谱（三餐加一次加餐），写明每种食物的名称和生重克数，并说明设计思路。",
-    materials: [
-      "男，58 岁，身高 172 cm，体重 80 kg，办公室工作（轻体力活动）",
-      "2 型糖尿病 6 年，口服二甲双胍，肾功能正常",
-      "饮食习惯：北方口味，偏爱面食，晚餐常吃得较晚"
-    ],
-    answer: [
-      "按理想体重（172 − 105 = 67 kg）和超重情况估算全天能量，约 20–25 kcal/kg，即约 1350–1700 kcal",
-      "碳水化合物供能约 45%–60%，以全谷物、杂豆替换部分精白面食",
-      "蛋白质约 15%–20%，脂肪约 20%–35%，控制饱和脂肪",
-      "食盐不超过 5 g，膳食纤维约 25–30 g，不使用添加糖",
-      "餐次分配合理，加餐安排在两餐之间，兼顾北方口味和可执行性"
-    ],
-    rubric: [
-      ["全天能量落在目标区间内（按食物成分表计算）", "自动", 20],
-      ["三大营养素供能比均在区间内", "自动", 20],
-      ["食盐、膳食纤维、添加糖符合要求", "自动", 20],
-      ["主食粗细搭配，替换方案符合患者口味", "专家", 15],
-      ["餐次与加餐安排合理，考虑用药与低血糖风险", "专家", 15],
-      ["提示需结合血糖监测，并在医生或营养师指导下调整", "专家", 10]
-    ]
-  },
-  {
-    id: "HS-SAF-0031",
-    domain: "食品与生产安全",
-    type: "标签合规审查",
-    grading: "自动判分 70% · 专家细则 30%",
-    difficulty: "中（交付时附模型实测通过率）",
-    basis: "GB 7718 预包装食品标签通则；GB 28050 预包装食品营养标签通则（以现行有效版本为准）",
-    prompt: "下面是一款发酵乳的标签信息。请找出所有不符合食品安全国家标准的地方，逐条说明违反的要求和整改建议。",
-    materials: [
-      "正面宣称：「0 糖 · 轻负担」",
-      "营养成分表（每 100 g）：能量 290 kJ，蛋白质 3.1 g，脂肪 3.3 g，碳水化合物 6.2 g，其中糖 4.8 g（未列钠）",
-      "配料表：白砂糖、生牛乳、乳酸菌（实际加入量生牛乳最多）",
-      "生产日期：见瓶盖；保质期：21 天；贮存条件：2–6 ℃冷藏"
-    ],
-    answer: [
-      "「0 糖」宣称不成立：无糖宣称要求糖含量不超过 0.5 g/100 g，本品为 4.8 g",
-      "营养成分表缺少钠，强制标示的核心营养素不完整",
-      "营养成分表未标示营养素参考值百分比（NRV%）",
-      "配料表未按加入量递减顺序排列，生牛乳应排在首位",
-      "生产日期标示位置和保质期、贮存条件写法符合常规要求，不应误判为问题"
-    ],
-    rubric: [
-      ["识别出「0 糖」宣称不符合含量要求", "自动", 20],
-      ["识别出缺少钠的标示", "自动", 15],
-      ["识别出缺少 NRV%", "自动", 15],
-      ["识别出配料排列顺序错误", "自动", 10],
-      ["未把合规项误判为违规（误报扣分）", "自动", 10],
-      ["整改建议具体可执行，引用条款准确", "专家", 30]
-    ]
-  },
-  {
-    id: "HS-CON-0042",
-    domain: "建筑设计与施工",
-    type: "危大工程识别 + 方案要点",
-    grading: "自动判分 55% · 专家细则 45%",
-    difficulty: "中高（交付时附模型实测通过率）",
-    basis: "《危险性较大的分部分项工程安全管理规定》（住建部令第 37 号）及配套实施通知",
-    prompt: "某住宅项目包含以下分部分项工程。请判断每一项是否属于危大工程，是否属于超过一定规模、需要组织专家论证的危大工程，并说明理由。最后写出深基坑专项施工方案应包含的主要内容。",
-    materials: [
-      "基坑开挖深度 6.2 m",
-      "地下室顶板模板支撑，搭设高度 9 m",
-      "悬挑式脚手架，分段架体搭设高度 22 m",
-      "QTZ80 塔式起重机安装与拆卸（最大额定起重量 8 t）",
-      "人工挖孔桩，开挖深度 12 m"
-    ],
-    answer: [
-      "基坑 6.2 m：危大工程，开挖深度 5 m 及以上属于超规模，需专家论证",
-      "模板支撑 9 m：搭设高度 8 m 及以上属于超规模，需专家论证",
-      "悬挑脚手架 22 m：分段架体搭设高度 20 m 及以上属于超规模，需专家论证",
-      "塔吊安拆：属于危大工程；起重量未达到 300 kN，不属于超规模",
-      "人工挖孔桩 12 m：属于危大工程；开挖深度未达到 16 m，不属于超规模"
-    ],
-    rubric: [
-      ["五项工程的危大 / 超规模判断全部正确", "自动", 55],
-      ["判断理由引用的规定和数值界限准确", "专家", 15],
-      ["方案内容覆盖工程概况、编制依据、施工计划、工艺技术、安全保证措施、人员配备、验收要求、应急处置、计算书及图纸", "专家", 20],
-      ["结合本项目条件给出针对性措施，而不是照抄模板", "专家", 10]
-    ]
-  },
-  {
-    id: "HS-MED-0018",
-    domain: "医疗器械注册",
-    type: "分类界定 + 注册路径",
-    grading: "自动判分 40% · 专家细则 60%",
-    difficulty: "高（交付时附模型实测通过率）",
-    basis: "医疗器械分类目录；医疗器械注册与备案管理办法；医疗器械软件、网络安全注册审查指导原则",
-    prompt: "一家境内企业计划上市一款家用上臂式电子血压计（示波法），可通过蓝牙把测量数据传到手机 App。请判断产品管理类别和注册审批部门，并列出注册申报中需要重点准备的内容。",
-    materials: [
-      "预期用途：家庭环境中成人无创测量血压和脉率",
-      "组成：主机、袖带、配套手机 App（显示和存储历史数据，不做诊断）",
-      "企业注册地：江苏省"
-    ],
-    answer: [
-      "管理类别：第二类医疗器械",
-      "审批部门：境内第二类医疗器械由企业所在地省级药品监督管理部门审查，本例为江苏省药品监督管理局",
-      "含软件组件，需按医疗器械软件相关指导原则准备软件研究资料",
-      "具有蓝牙数据传输，需按网络安全相关指导原则准备网络安全资料",
-      "临床评价路径需对照现行免于临床评价目录和同品种产品逐项论证，不能直接下结论"
-    ],
-    rubric: [
-      ["管理类别判断正确", "自动", 20],
-      ["审批部门判断正确", "自动", 20],
-      ["识别出软件研究资料要求", "专家", 15],
-      ["识别出网络安全资料要求", "专家", 15],
-      ["临床评价路径的论证方法正确，没有武断结论", "专家", 20],
-      ["其余申报资料要点完整（产品技术要求、检验报告、说明书标签等）", "专家", 10]
-    ]
-  }
-];
-
-const tablist = document.querySelector(".tabs");
-const viewer = document.getElementById("viewer");
-let showJson = false;
-let current = 0;
-
-function esc(s) {
-  return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-}
-
-function toJson(s) {
-  return JSON.stringify({
-    task_id: s.id,
-    domain: s.domain,
-    task_type: s.type,
-    prompt: s.prompt,
-    materials: s.materials,
-    reference_points: s.answer,
-    rubric: s.rubric.map(([criterion, grader, weight]) => ({ criterion, grader: grader === "自动" ? "program" : "expert", weight })),
-    basis: s.basis,
-    review: { experts: 2, status: "sample" }
-  }, null, 2);
-}
-
-function render() {
-  const s = SAMPLES[current];
-  const total = s.rubric.reduce((a, r) => a + r[2], 0);
-  viewer.innerHTML = `
-    <div class="viewer-grid">
-      <div class="meta">
-        <div><span>编号</span><b class="mono">${esc(s.id)}</b></div>
-        <div><span>任务类型</span><b>${esc(s.type)}</b></div>
-        <div><span>判分方式</span><b>${esc(s.grading)}</b></div>
-        <div><span>难度</span><b>${esc(s.difficulty)}</b></div>
-        <div style="grid-column: 1 / -1;"><span>依据</span><b>${esc(s.basis)}</b></div>
-      </div>
-      <div class="task">
-        <div><h4>题目</h4><p class="prompt">${esc(s.prompt)}</p></div>
-        <div><h4>材料</h4><div class="materials"><ul>${s.materials.map(m => `<li>${esc(m)}</li>`).join("")}</ul></div></div>
-        <div class="answer"><h4>参考答案要点</h4><ul>${s.answer.map(m => `<li>${esc(m)}</li>`).join("")}</ul></div>
-        <div>
-          <h4>评分细则（满分 ${total}）</h4>
-          <div class="table-scroll">
-            <table class="rubric">
-              <thead><tr><th>检查项</th><th>判分</th><th style="text-align:right">分值</th></tr></thead>
-              <tbody>${s.rubric.map(([c, g, w]) => `<tr><td>${esc(c)}</td><td><span class="tag ${g === "自动" ? "auto" : ""}" style="margin-left:0">${esc(g)}</span></td><td class="w">${w}</td></tr>`).join("")}</tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="viewer-foot">
-      <span>虚构示例，仅展示交付格式。正式交付附专家复核记录和模型实测报告。</span>
-      <span style="display:flex; gap:8px;">
-        <button class="copy" type="button" id="toggle-json">${showJson ? "收起 JSON" : "查看 JSON"}</button>
-        <button class="copy" type="button" id="copy-json">复制 JSON</button>
-      </span>
-    </div>
-    <pre class="json" id="json-view" ${showJson ? "" : "hidden"}>${esc(toJson(s))}</pre>`;
-  document.getElementById("toggle-json").onclick = () => { showJson = !showJson; render(); };
-  document.getElementById("copy-json").onclick = e => copyText(toJson(s), e.currentTarget, document.getElementById("json-view"));
-}
-
-SAMPLES.forEach((s, i) => {
-  const b = document.createElement("button");
-  b.className = "tab";
-  b.type = "button";
-  b.id = "tab-" + i;
-  b.setAttribute("role", "tab");
-  b.textContent = s.domain;
-  b.onclick = () => select(i);
-  tablist.appendChild(b);
-});
-
-function select(i) {
-  current = i;
-  tablist.querySelectorAll(".tab").forEach((t, j) => t.setAttribute("aria-selected", String(j === i)));
-  viewer.setAttribute("aria-labelledby", "tab-" + i);
-  render();
-}
-
-function copyText(text, button, fallbackEl) {
-  const done = () => { const old = button.textContent; button.textContent = "已复制"; setTimeout(() => { button.textContent = old; }, 1500); };
-  const fallback = () => {
-    if (!fallbackEl) return;
-    fallbackEl.hidden = false;
-    if (fallbackEl.select) { fallbackEl.select(); }
-    else { const r = document.createRange(); r.selectNodeContents(fallbackEl); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
-    button.textContent = "已选中，请手动复制";
-  };
-  try {
-    navigator.clipboard.writeText(text).then(done, fallback);
-  } catch (err) { fallback(); }
-}
-
 document.querySelectorAll("[data-copy]").forEach(btn => {
-  btn.onclick = () => { const el = document.getElementById(btn.dataset.copy); copyText(el.textContent, btn, el); };
+  btn.addEventListener("click", () => {
+    const el = document.getElementById(btn.dataset.copy);
+    const done = t => { btn.textContent = t; setTimeout(() => { btn.textContent = "Copy"; }, 1600); };
+    const select = () => {
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r); done("Selected");
+    };
+    try { navigator.clipboard.writeText(el.textContent.trim()).then(() => done("Copied"), select); }
+    catch (e) { select(); }
+  });
 });
 
-document.getElementById("brief").addEventListener("submit", e => {
-  e.preventDefault();
-  const f = e.currentTarget;
-  const domains = [...f.querySelectorAll('input[name="domain"]:checked')].map(x => x.value).join("、") || "未选择";
-  const text = [
-    "【衡数 · 合作需求】",
-    "机构：" + (f.org.value.trim() || "未填写"),
-    "角色：" + (f.role.value.trim() || "未填写"),
-    "领域：" + domains,
-    "需求：" + f.type.value,
-    "场景：" + (f.note.value.trim() || "未填写")
-  ].join("\n");
-  const out = document.getElementById("f-summary");
-  out.value = text;
-  document.getElementById("summary").hidden = false;
-  document.getElementById("status").textContent = "摘要已生成，复制后发到上面的微信或邮箱。";
-});
+// Points drift, slowly gather onto one horizontal line, then loosen again.
+(function () {
+  const canvas = document.getElementById("field");
+  const ctx = canvas.getContext("2d");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let w, h, dpr, pts = [], t0 = performance.now();
 
-document.getElementById("copy-summary").onclick = e => {
-  const out = document.getElementById("f-summary");
-  copyText(out.value, e.currentTarget, out);
-};
+  function dotColor() { return getComputedStyle(document.documentElement).getPropertyValue("--dot").trim() || "22,24,28"; }
 
-select(0);
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = canvas.clientWidth; h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(220, (w * h) / 6500));
+    pts = Array.from({ length: n }, (_, i) => ({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.12, vy: (Math.random() - 0.5) * 0.12,
+      tx: (i + 0.5) / n * w, r: Math.random() * 1.1 + 0.4, a: Math.random() * 0.35 + 0.15
+    }));
+  }
+
+  function frame(now) {
+    const rgb = dotColor();
+    const lineY = h * 0.62;
+    // Gather strength cycles over ~26 s: mostly loose, briefly converging.
+    const phase = ((now - t0) / 26000) % 1;
+    const g = reduce ? 0 : Math.pow(Math.max(0, Math.sin(phase * Math.PI * 2 - Math.PI / 2) * 0.5 + 0.5), 3);
+    ctx.clearRect(0, 0, w, h);
+    for (const p of pts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x += w; if (p.x > w) p.x -= w;
+      if (p.y < 0) p.y += h; if (p.y > h) p.y -= h;
+      const dx = p.x + (p.tx - p.x) * g * 0.9;
+      const dy = p.y + (lineY - p.y) * g * 0.9;
+      ctx.fillStyle = `rgba(${rgb}, ${p.a * (0.6 + g * 0.6)})`;
+      ctx.beginPath(); ctx.arc(dx, dy, p.r, 0, Math.PI * 2); ctx.fill();
+    }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+
+  resize();
+  addEventListener("resize", () => { resize(); if (reduce) frame(performance.now()); });
+  frame(performance.now());
+})();
 </script>
 </body>
 </html>
